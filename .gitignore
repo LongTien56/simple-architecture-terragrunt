@@ -1,4 +1,4 @@
-.terraform/
+.terraform/*
 demo/ap-southeast-1/alb/.terragrunt-cache/
 demo/ap-southeast-1/ec2/.terragrunt-cache/
 demo/ap-southeast-1/key-pair/.terragrunt-cache/
