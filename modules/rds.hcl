@@ -27,6 +27,7 @@ dependency "vpc" {
 
 
 inputs = {
+  create_security_group = false
   name           = "${local.env}-database"
   engine         = local.global_vars.locals.rds_settings.engine
   engine_version = local.global_vars.locals.rds_settings.engine_version

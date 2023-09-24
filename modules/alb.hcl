@@ -36,8 +36,15 @@ dependency "ec2"{
   }
 }
 
-inputs = {
+dependency "s3_logs" {
+  config_path ="${dirname(find_in_parent_folders())}/demo/ap-southeast-1/s3/logs"
+  mock_outputs = {
+    s3_bucket_id = "logs_sample_bucket"
+  }
+}
 
+inputs = {
+  create_security_group = false
   name = local.global_vars.locals.alb_settings["name"]
 
   load_balancer_type = local.global_vars.locals.alb_settings["load_balancer_type"]
@@ -46,9 +53,9 @@ inputs = {
   subnets            = [ for subnet in dependency.vpc.outputs.public_subnets : subnet ]
   security_groups    = [dependency.sg.outputs.alb_sg]
 
-#   access_logs = {
-#     bucket = "my-alb-logs"
-#   }
+  access_logs = {
+    bucket = dependency.s3_logs.outputs.s3_bucket_id
+  }
 
   target_groups = [
     {
