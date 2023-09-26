@@ -43,6 +43,13 @@ dependency "s3_logs" {
   }
 }
 
+dependency "ssl" {
+  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/acm"
+  mock_outputs = {
+    acm_certificate_arn = "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
+  }
+}
+
 inputs = {
   create_security_group = false
   name = local.global_vars.locals.alb_settings["name"]
@@ -72,16 +79,36 @@ inputs = {
     }
   ]
 
-#   https_listeners = [
-#     {
-#       port               = 443
-#       protocol           = "HTTPS"
-#       certificate_arn    = "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
-#       target_group_index = 0
-#     }
-#   ]
-
-  http_tcp_listeners = local.global_vars.locals.alb_settings["http_tcp_listeners"]
+  https_listeners = [
+    {
+      port            = 443
+      protocol        = "HTTPS"
+      certificate_arn = dependency.ssl.outputs.acm_certificate_arn
+      action_type     = "fixed-response"
+      fixed_response = {
+        content_type = "text/html"
+        message_body = "Access denied"
+        status_code  = "403"
+      }
+    }
+  ]
+  
+  http_tcp_listeners = [
+      {
+        port               = 80
+        protocol           = "HTTP"
+        # target_group_index = 0
+        action_type = "redirect"
+        redirect = {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+        host     = "#{host}"
+        path     = "/#{path}"
+        query    = "#{query}"
+        }
+      }
+  ]
 
   # tags = {
   #     Environment = "${local.env}}"

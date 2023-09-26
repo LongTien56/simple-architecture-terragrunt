@@ -56,23 +56,6 @@ locals {
         #       target_group_index = 0
         #     }
         #   ]
-
-        http_tcp_listeners = [
-          {
-            port               = 80
-            protocol           = "HTTP"
-            # target_group_index = 0
-            action_type = "redirect"
-            redirect = {
-              port        = "443"
-              protocol    = "HTTPS"
-              status_code = "HTTP_301"
-              host     = "#{host}"
-              path     = "/#{path}"
-              query    = "#{query}"
-            }
-          }
-        ]
     }
 
 
@@ -124,7 +107,7 @@ locals {
     autoscale_lower_increment      = -1
     autoscale_upper_increment      = 2
     loadbalancer_type              = "application"
-    # loadbalancer_ssl_policy        = "ELBSecurityPolicy-TLS-1-2-Ext-2018-06"
+    loadbalancer_ssl_policy        = "ELBSecurityPolicy-TLS-1-2-Ext-2018-06"
     rolling_update_enabled         = false
     # logs_retention_in_days         = 30
     # enable_stream_logs             = true
@@ -231,6 +214,19 @@ locals {
       }
     ]
 
+  }
+
+  root_domain = "hblab.dev"
+  domain_names = {
+    dev   = "${local.project_name}.${local.root_domain}"
+    stage = "stage.${local.root_domain}"
+    prod  = local.root_domain
+  }
+
+  domain_locals = {
+    dev   = "dev.${lower(local.project_name)}.local"
+    prod  = "stage.${lower(local.project_name)}.local"
+    stage = "${lower(local.project_name)}.local"
   }
 
 

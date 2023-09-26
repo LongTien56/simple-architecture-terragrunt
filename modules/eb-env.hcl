@@ -35,9 +35,9 @@ dependency "app"{
 }
 
 
-# dependency "s3_logs"{
-#   config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/s3/logs"
-# }
+dependency "s3_logs"{
+  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/s3/logs"
+}
 
 dependency "alb" {
     config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/alb"
@@ -45,9 +45,16 @@ dependency "alb" {
       lb_arn = "alb-1234"
     }
 }
+dependency "ssl" {
+  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/acm"
+  mock_outputs = {
+    acm_certificate_arn = "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
+  }
+}
 
 
 inputs = {
+  application_port = 443
   force_destroy = true
   create_security_group = false
   ssh_listener_enabled = true
@@ -61,7 +68,6 @@ inputs = {
   keypair                     = dependency.key_pair.outputs.key_pair
   associate_public_ip_address = try(local.global_vars.locals.eb_settings["${local.name}"]["${local.env}"]["associate_public_ip_address"], false)
   //ami_id  = ""
-
   # configuration
   instance_type    = try(local.global_vars.locals.eb_settings["${local.name}"]["${local.env}"]["instance_type"], "t3.small")
   root_volume_size = try(local.global_vars.locals.eb_settings["root_volume_size"], "30")
@@ -76,14 +82,15 @@ inputs = {
 
   environment_type             = try(local.global_vars.locals.eb_settings["${local.name}"]["${local.env}"]["environment_type"], "LoadBalanced")
   healthcheck_url              = try(local.global_vars.locals.eb_settings["healthcheck_url"], "/")
-#   loadbalancer_certificate_arn = dependency.ssl.outputs.acm_certificate_arn
-#   loadbalancer_ssl_policy      = try(local.global_vars.locals.eb_settings["loadbalancer_ssl_policy"], "ELBSecurityPolicy-TLS-1-2-Ext-2018-06")
+
   # associated_security_group_ids = dependency.sg.outputs.ec2_sg
   # security groups
   # additional_security_groups          = [dependency.sg.outputs.ec2_sg]
   
   #loadblancer
-  # loadbalancer_subnets        = dependency.vpc.outputs.public_subnets
+  loadbalancer_certificate_arn = dependency.ssl.outputs.acm_certificate_arn
+  loadbalancer_ssl_policy      = try(local.global_vars.locals.eb_settings["loadbalancer_ssl_policy"], "ELBSecurityPolicy-TLS-1-2-Ext-2018-06")
+  loadbalancer_subnets        = dependency.vpc.outputs.public_subnets
   loadbalancer_type            = try(local.global_vars.locals.eb_settings["loadbalancer_type"], "application")
   # loadbalancer_security_groups        = [dependency.sg.outputs.alb_sg]
   # loadbalancer_managed_security_group = dependency.sg.outputs.alb_sg
@@ -129,6 +136,15 @@ inputs = {
     #     name      = "Notification Topic Name"
     #     value     = "${local.name_prefix}-${local.name}"
     #   },
+    # allow to create https listener route to asg instead of http listener
+      {
+        namespace = "aws:elbv2:listener:443"
+        name      = "Rules"
+        # Setting the default value here prevent 
+        # the default rule from being created in the ALB's HTTP:80 listener
+        # Instead the default rule will be created in the HTTPS:443 listener
+        value     = "default"
+      },
       {
         "name"      = "Cooldown"
         "namespace" = "aws:autoscaling:asg"
