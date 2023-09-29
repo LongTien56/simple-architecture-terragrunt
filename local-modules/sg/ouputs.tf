@@ -10,3 +10,8 @@ output "alb_sg" {
 output "rds_sg" {
   value = aws_security_group.rds_sg.id
 }
+
+
+output "elasticache_sg" {
+  value = aws_security_group.elasticache_sg.id
+}

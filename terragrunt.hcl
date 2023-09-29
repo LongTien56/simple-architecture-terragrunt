@@ -24,7 +24,7 @@ remote_state {
   config = {
     encrypt        = true
     bucket         = format("${lower(local.project_name)}-tfstate-%s", get_aws_account_id())
-    key            = "${replace(path_relative_to_include(), "demo/", "${local.env_vars.locals.env}/")}/terraform.tfstate"
+    key            = "${replace(path_relative_to_include(), "_env/", "${local.env_vars.locals.env}/")}/terraform.tfstate"
     region         = try(local.global_vars.locals.state_region, local.aws_region)
     dynamodb_table = "${local.project_name}-terraform-locks"
 
@@ -40,7 +40,8 @@ generate "provider" {
 
   contents = <<EOF
 provider "aws" {
-    region = "ap-southeast-1"
+    region = "${local.aws_region}"
 }
 EOF
+
 }

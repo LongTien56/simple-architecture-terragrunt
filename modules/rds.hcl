@@ -11,16 +11,19 @@ locals {
 
 
 dependency "sg" {
-  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/sg"
+  config_path = "${dirname(find_in_parent_folders())}/_env/sg"
   mock_outputs = {
     ec2_sg = "sg-1234"
+    rds_sg = "sg-3456"
   }
 }
 
 dependency "vpc" {
-  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/vpc"
+  config_path = "${dirname(find_in_parent_folders())}/_env/vpc"
   mock_outputs = {
       public_subnets = ["subnet-1234", "subnet-5678"]
+      vpc_id = "vpc-1234"
+      private_subnets = ["subnet-2345", "subnet-898"]
   }
 }
 

@@ -95,3 +95,29 @@ resource "aws_security_group" "rds_sg" {
     Name = "rds_sg"
   }
 }
+
+
+resource "aws_security_group" "elasticache_sg" {
+  name        = "elasticache_sg"
+  description = "Allow inbound traffic from EC2 monitor and EB"
+  vpc_id      = var.vpc_id
+
+  ingress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "tcp"
+    security_groups = [aws_security_group.ec2_sg.id]
+  }
+
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    Name = "elasticache_sg"
+  }
+}

@@ -1,5 +1,5 @@
 locals {
-    project_name = "tienll"
+    project_name = "tienll-hblab"
 
 
     vpc_settings = {
@@ -229,5 +229,96 @@ locals {
     stage = "${lower(local.project_name)}.local"
   }
 
+  cf_settings = {
+    s3_rname = "files"
+    behavior = {
+      patterns = [
+        # "/api/*",
+        "/upload/*",
+      ]
 
+      allowed_methods = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+      cached_methods  = ["GET", "HEAD"]
+      compress        = true
+      default_ttl     = 0
+      max_ttl         = 0
+      min_ttl         = 0
+      query_string    = true
+      headers         = ["Access-Control-Request-Headers", "Access-Control-Request-Method", "Origin"]
+      cookies_forward = "all"
+
+    }
+
+    origin_config = {
+      origin_protocol_policy   = "https-only"
+      origin_keepalive_timeout = 60
+      origin_read_timeout      = 60
+    }
+    headers             = ["Access-Control-Request-Headers", "Access-Control-Request-Method", "Origin", "Host"]
+    cookies_forward     = "all"
+    default_root_object = ""
+    custom_header_name  = "${upper(local.project_name)}-X-SECURE"
+    connection_timeout  = 10
+
+    enable_cached_backend = true
+    cached_backend = {
+      target_origin_id       = "backend"
+      viewer_protocol_policy = "redirect-to-https"
+
+      allowed_methods = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
+      cached_methods  = ["GET", "HEAD"]
+      compress        = true
+      default_ttl     = 0
+      max_ttl         = 0
+      min_ttl         = 0
+      query_string    = true
+      headers         = ["Access-Control-Request-Headers", "Access-Control-Request-Method", "Origin"]
+      cookies_forward = "all"
+    }
+
+    prod = {
+      alias               = ["${local.root_domain}", "*.${local.root_domain}"]
+      price_class         = "PriceClass_All"
+      custom_header_value = "${local.project_name}-prod-35Sr52P2kbBx7C6j"
+    }
+    stage = {
+      alias               = ["${local.domain_names["stage"]}", "*.${local.domain_names["stage"]}"]
+      price_class         = "PriceClass_200"
+      custom_header_value = "${local.project_name}-stage-19A2ZSKgvD635TrQ"
+    }
+    dev = {
+      alias               = ["${lower(local.domain_names["dev"])}", "*.${lower(local.domain_names["dev"])}"]
+      price_class         = "PriceClass_200"
+      custom_header_value = "${local.project_name}-dev-IDNLD3s7d5HHJ22S"
+    }
+
+    dns_alias_enabled = false
+  }
+
+
+  elasticache_settings = {
+    family         = "redis6.x"
+    engine_version = "6.x"
+    dev = {
+      instance_type                        = "cache.t3.micro"
+      cluster_size                         = "1"
+      automatic_failover_enabled           = false
+      cluster_mode_num_node_groups         = "1"
+      cluster_mode_replicas_per_node_group = "1"
+    }
+    stage = {
+      instance_type                        = "cache.t3.small"
+      cluster_size                         = "2"
+      automatic_failover_enabled           = true
+      cluster_mode_num_node_groups         = "2"
+      cluster_mode_replicas_per_node_group = "2"
+    }
+    prod = {
+      instance_type                        = "cache.t3.small"
+      cluster_size                         = "2"
+      automatic_failover_enabled           = true
+      cluster_mode_num_node_groups         = "2"
+      cluster_mode_replicas_per_node_group = "2"
+    }
+  }
 }

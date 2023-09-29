@@ -1,10 +1,6 @@
 .terraform/*
-demo/ap-southeast-1/alb/.terragrunt-cache/
-demo/ap-southeast-1/ec2/.terragrunt-cache/
-demo/ap-southeast-1/key-pair/.terragrunt-cache/
-demo/ap-southeast-1/rds/.terragrunt-cache/
-demo/ap-southeast-1/sg/.terragrunt-cache/
-demo/ap-southeast-1/vpc/.terragrunt-cache/
+.terragrunt-*/
+
 provider.tf
 terraform.tfstate
 .terraform.lock.hcl

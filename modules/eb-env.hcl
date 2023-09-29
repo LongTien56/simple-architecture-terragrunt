@@ -10,43 +10,51 @@ locals {
 }
 
 dependency "vpc" {
-  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/vpc"
+  config_path = "${dirname(find_in_parent_folders())}/_env/vpc"
   mock_outputs = {
       public_subnets = ["subnet-1234", "subnet-5678"]
+      vpc_id = "vpc-1234"
+      private_subnets = ["subnet-7890", "subnet-456"]
   }
 }
 
 dependency "key_pair"{
-  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/key_pair"
+  config_path = "${dirname(find_in_parent_folders())}/_env/key_pair"
   mock_outputs = {
   key_pair = "hblab-test"
   }
 }
 
 dependency "sg" {
-  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/sg"
+  config_path = "${dirname(find_in_parent_folders())}/_env/sg"
   mock_outputs = {
     ec2_sg = "sg-1234"
   }
 }
 
 dependency "app"{
-    config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/eb/api/app"
+    config_path = "${dirname(find_in_parent_folders())}/_env/eb/api/app"
+    mock_outputs = {
+      elastic_beanstalk_application_name = "elastic-beantalk-app"
+    }
 }
 
 
 dependency "s3_logs"{
-  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/s3/logs"
+  config_path = "${dirname(find_in_parent_folders())}/_env/s3/logs"
+  mock_outputs = {
+    s3_bucket_id = "s3-1234"
+  }
 }
 
 dependency "alb" {
-    config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/alb"
+    config_path = "${dirname(find_in_parent_folders())}/_env/alb"
     mock_outputs = {
       lb_arn = "alb-1234"
     }
 }
 dependency "ssl" {
-  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/acm"
+  config_path = "${dirname(find_in_parent_folders())}/_env/acm/api"
   mock_outputs = {
     acm_certificate_arn = "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
   }

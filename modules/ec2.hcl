@@ -3,7 +3,7 @@ terraform {
 }
 
 dependency "vpc" {
-  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/vpc"
+  config_path = "${dirname(find_in_parent_folders())}/_env/vpc"
   mock_outputs = {
       public_subnets = ["subnet-1234", "subnet-5678"]
   }
@@ -11,14 +11,14 @@ dependency "vpc" {
 
 
 dependency "sg" {
-  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/sg"
+  config_path = "${dirname(find_in_parent_folders())}/_env/sg"
   mock_outputs = {
     ec2_sg = "sg-1234"
   }
 }
 
 dependency "key_pair"{
-  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/key_pair"
+  config_path = "${dirname(find_in_parent_folders())}/_env/key_pair"
   mock_outputs = {
   key_pair = "hblab-test"
   }

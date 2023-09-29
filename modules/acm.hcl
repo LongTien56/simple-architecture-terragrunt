@@ -5,7 +5,10 @@ terraform {
 ## Dependencies
 
 dependency "dns" {
-  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/route53/public"
+  config_path = "${dirname(find_in_parent_folders())}/_env/route53/public"
+  mock_outputs = {
+    route53_zone_zone_id = "zone-123456"
+  }
 }
 
 ## Variables:
@@ -32,8 +35,9 @@ inputs = {
   wait_for_validation    = true
   validate_certificate   = true
   create_route53_records = true
-  zone_id                = try(dependency.dns.outputs.route53_zone_zone_id["${local.domain_name}"], "")
+  # zone_id                = try(dependency.dns.outputs.route53_zone_zone_id["${local.domain_name}"], "")
+  zone_id                = dependency.dns.outputs.route53_zone_zone_id["${local.domain_name}"]
   tags                   = local.tags
 
-  validation_allow_overwrite_records = false
+  validation_allow_overwrite_records = true
 }

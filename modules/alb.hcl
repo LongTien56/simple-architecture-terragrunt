@@ -14,7 +14,7 @@ locals {
 }
 
 dependency "vpc" {
-    config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/vpc"
+    config_path = "${dirname(find_in_parent_folders())}/_env/vpc"
     mock_outputs = {
         vpc_id = "vpc-1234"
         public_subnets = ["subnet-1234", "subnet-5678"]
@@ -23,28 +23,28 @@ dependency "vpc" {
 
 
 dependency "sg" {
-  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/sg"
+  config_path = "${dirname(find_in_parent_folders())}/_env/sg"
   mock_outputs = {
     alb_sg = "sg-3456"
   }
 }
 
 dependency "ec2"{
-  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/ec2"
+  config_path = "${dirname(find_in_parent_folders())}/_env/ec2"
   mock_outputs = {
     id = "ec2-1234"
   }
 }
 
 dependency "s3_logs" {
-  config_path ="${dirname(find_in_parent_folders())}/demo/ap-southeast-1/s3/logs"
+  config_path ="${dirname(find_in_parent_folders())}/_env/s3/logs"
   mock_outputs = {
     s3_bucket_id = "logs_sample_bucket"
   }
 }
 
 dependency "ssl" {
-  config_path = "${dirname(find_in_parent_folders())}/demo/ap-southeast-1/acm"
+  config_path = "${dirname(find_in_parent_folders())}/_env/acm/api"
   mock_outputs = {
     acm_certificate_arn = "arn:aws:iam::123456789012:server-certificate/test_cert-123456789012"
   }
