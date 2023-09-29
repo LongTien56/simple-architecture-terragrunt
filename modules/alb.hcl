@@ -52,8 +52,6 @@ dependency "ssl" {
 
 inputs = {
   create_security_group = false
-  name = local.global_vars.locals.alb_settings["name"]
-
   load_balancer_type = local.global_vars.locals.alb_settings["load_balancer_type"]
 
   vpc_id             = dependency.vpc.outputs.vpc_id
@@ -66,17 +64,20 @@ inputs = {
 
   target_groups = [
     {
-      name_prefix      = "pref-"
+      name             = lower("${local.global_vars.locals.project_name}-${local.env}-${local.name}")
       backend_protocol = "HTTP"
       backend_port     = 80
-      target_type      = "instance"
-      targets = {
-        my_target = {
-          target_id = dependency.ec2.outputs.id
-          port = 80
-        }
+      target_type      = try(local.global_vars.locals.elb_settings["target_type"], "instance")
+      health_check = {
+        interval            = 10
+        path                = try(local.global_vars.locals.elb_settings["health_check_path"], "/")
+        matcher             = try(local.global_vars.locals.elb_settings["matcher"], "200")
+        timeout             = 5
+        healthy_threshold   = 3
+        unhealthy_threshold = 2
       }
-    }
+      deregistration_delay = try(local.global_vars.locals.elb_settings["deregistration_delay"], "300")
+    },
   ]
 
   https_listeners = [

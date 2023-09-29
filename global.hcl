@@ -44,7 +44,7 @@ locals {
     }
 
     alb_settings = {
-        name = "my-alb"
+        name = "${local.project_name}-sample-alb"
 
         load_balancer_type = "application"
 
